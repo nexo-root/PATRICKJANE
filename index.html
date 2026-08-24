@@ -35,8 +35,14 @@ html,body{height:100%;overflow:hidden;background:#080706}
 body{font-family:ISans,system-ui,sans-serif;color:var(--texto);
      display:grid;place-items:center}
 
-#escena{width:1600px;height:900px;position:relative;overflow:hidden;
-        transform:scale(var(--k,1));transform-origin:center;
+/* Centrado a prueba de balas: fijo al centro de la ventana y escalado desde
+   ahí. Con `display:grid` en el body, un elemento de 1600px se desbordaba en
+   cualquier pantalla más chica y quedaba cortado. Así el centro es siempre
+   el centro, y si --k fallara el fallback 1 igual muestra la diapositiva. */
+#escena{width:1600px;height:900px;position:fixed;overflow:hidden;
+        left:50%;top:50%;
+        transform:translate(-50%,-50%) scale(var(--k,1));
+        transform-origin:center center;
         background:var(--fondo);box-shadow:0 40px 120px rgba(0,0,0,.85)}
 
 .slide{position:absolute;inset:0;opacity:0;visibility:hidden;background:var(--fondo)}
@@ -168,7 +174,10 @@ body{font-family:ISans,system-ui,sans-serif;color:var(--texto);
 @media print{
   @page{size:1600px 900px;margin:0}
   html,body{overflow:visible;background:#fff;display:block;height:auto}
+  /* En impresión el escenario vuelve al flujo normal: position:static y sin
+     transform, si no el `fixed` del modo pantalla rompe la paginación. */
   #escena{transform:none!important;box-shadow:none;width:1600px;
+          position:static!important;left:auto!important;top:auto!important;
           height:auto!important;overflow:visible!important;display:block}
   #escena::after{display:none}
   .slide{position:relative!important;opacity:1!important;visibility:visible!important;

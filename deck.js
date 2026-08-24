@@ -27,7 +27,11 @@ let animando = false;
 /* ── Escalado del escenario 1600x900 ─────────────────────────── */
 function escalar() {
   if (IMPRIMIR) return;
-  document.documentElement.style.setProperty('--k', Math.min(innerWidth / 1600, innerHeight / 900));
+  const k = Math.min(innerWidth / 1600, innerHeight / 900);
+  // OJO: setProperty necesita un STRING. Pasarle el número directo hacía que
+  // algunos navegadores lo guardaran como "0" -> scale(0) -> pantalla EN BLANCO.
+  // Fue exactamente el bug que rompió la versión publicada en GitHub Pages.
+  document.documentElement.style.setProperty('--k', String(k > 0 ? k : 1));
 }
 addEventListener('resize', escalar);
 escalar();
