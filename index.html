@@ -427,6 +427,9 @@ body{font-family:ISans,system-ui,sans-serif;color:var(--texto);
 </div>
 
 <script src="assets/gsap.min.js"></script>
-<script src="deck.js"></script>
+<!-- El ?v= obliga al navegador a bajar el archivo nuevo. Sin esto, quien ya
+     abrió la página se queda con el deck.js viejo cacheado (y con el bug de
+     la pantalla en blanco). Subir el número ante cualquier cambio de deck.js. -->
+<script src="deck.js?v=2"></script>
 </body>
 </html>
