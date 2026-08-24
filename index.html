@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>El Mentalista · Patrick Jane — Psicología</title>
+
+<!--
+  REFERENCIA ESTETICA: expediente policial abierto de noche.
+  Carbon calido, tinta roja de Red John, fotos en blanco y negro. Fotos de la
+  SERIE, no del actor. Ninguna slide repite la estructura de otra.
+  Todo corre OFFLINE: fuentes, GSAP e imagenes estan en assets/.
+-->
+
+<style>
+@font-face{font-family:Fraunces;src:url(assets/fraunces-900.woff2)format('woff2');font-weight:900;font-display:block}
+@font-face{font-family:Fraunces;src:url(assets/fraunces-600.woff2)format('woff2');font-weight:600;font-display:block}
+@font-face{font-family:Fraunces;src:url(assets/fraunces-600i.woff2)format('woff2');font-weight:600;font-style:italic;font-display:block}
+@font-face{font-family:Fraunces;src:url(assets/fraunces-400.woff2)format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:Fraunces;src:url(assets/fraunces-400i.woff2)format('woff2');font-weight:400;font-style:italic;font-display:block}
+@font-face{font-family:Fraunces;src:url(assets/fraunces-300.woff2)format('woff2');font-weight:300;font-display:block}
+@font-face{font-family:ISans;src:url(assets/isans-400.woff2)format('woff2');font-weight:400;font-display:block}
+@font-face{font-family:ISans;src:url(assets/isans-500.woff2)format('woff2');font-weight:500;font-display:block}
+@font-face{font-family:ISans;src:url(assets/isans-600.woff2)format('woff2');font-weight:600;font-display:block}
+
+/* ── PALETA: carbon calido oscuro. Nada de azul, nunca negro puro. ── */
+:root{
+  --fondo:#121110; --fondo-2:#1A1917; --fondo-3:#242220;
+  --texto:#E7E2D9; --texto-2:#9C948A; --texto-3:#6A645C;
+  --sangre:#C1272D; --linea:#302D29; --frio:#7C7062;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#080706}
+body{font-family:ISans,system-ui,sans-serif;color:var(--texto);
+     display:grid;place-items:center}
+
+#escena{width:1600px;height:900px;position:relative;overflow:hidden;
+        transform:scale(var(--k,1));transform-origin:center;
+        background:var(--fondo);box-shadow:0 40px 120px rgba(0,0,0,.85)}
+
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;background:var(--fondo)}
+.slide.viva{opacity:1;visibility:visible}
+
+/* Grano sutil. En oscuro va en screen, no en multiply. */
+#escena::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:60;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.035;mix-blend-mode:screen}
+
+/* ── TIPOGRAFIA: contraste extremo 900 contra 300 ── */
+.tit{font-family:Fraunces;font-weight:900;letter-spacing:-.035em;line-height:.9;
+     color:var(--texto)}
+.t-xl{font-size:152px} .t-lg{font-size:106px} .t-md{font-size:76px}
+.cuerpo{font-family:Fraunces;font-weight:300;font-size:33px;line-height:1.44;
+        color:var(--texto-2);max-width:24ch}
+.cuerpo b,.cuerpo strong{font-weight:600;color:var(--texto)}
+.cuerpo em{font-style:italic;font-weight:400}
+.rojo{color:var(--sangre)}
+
+.sello{font-family:ISans;font-weight:600;font-size:17px;letter-spacing:.17em;
+       text-transform:uppercase;color:var(--sangre)}
+.meta{font-family:ISans;font-weight:400;font-size:18px;color:var(--texto-3)}
+
+.pie{position:absolute;left:64px;right:64px;bottom:34px;display:flex;
+     justify-content:space-between;align-items:center;font-family:ISans;
+     font-size:15px;letter-spacing:.13em;text-transform:uppercase;
+     color:var(--texto-3);z-index:20}
+.pie .num{font-family:Fraunces;font-style:italic;font-weight:400;font-size:22px;
+          letter-spacing:0;text-transform:none}
+
+.marco{position:absolute;inset:34px;pointer-events:none;z-index:5}
+.marco i{position:absolute;width:34px;height:34px;border:2px solid var(--linea)}
+.marco i:nth-child(1){top:0;left:0;border-right:0;border-bottom:0}
+.marco i:nth-child(2){top:0;right:0;border-left:0;border-bottom:0}
+.marco i:nth-child(3){bottom:0;left:0;border-right:0;border-top:0}
+.marco i:nth-child(4){bottom:0;right:0;border-left:0;border-top:0}
+
+.barra{position:absolute;top:0;left:0;height:8px;background:var(--sangre);
+       width:0;z-index:30}
+
+/* ── FOTOS ──
+   Sin difuminados raros: las fotos van NITIDAS, con un velo sólido del mismo
+   color del fondo cuando hace falta que el texto se lea encima. */
+.foto{position:relative;background:var(--fondo-3);
+      box-shadow:0 22px 60px rgba(0,0,0,.6);overflow:hidden}
+/* TODAS las fotos en blanco y negro con cuerpo noir. Un pelín de calidez
+   (sepia .06) para que no se vean grises-muertas en pantallas frías, pero
+   sigue siendo blanco y negro. Nada de tinte azul. */
+.foto img{display:block;width:100%;height:100%;object-fit:cover;
+          filter:grayscale(1) sepia(.06) contrast(1.14) brightness(1.03)}
+.foto.frio img{filter:grayscale(1) sepia(.06) contrast(1.16) brightness(1.02)}
+.foto .pie-foto{font-family:Fraunces;font-style:italic;font-weight:400;font-size:17px;
+                color:var(--texto-3);position:absolute;left:0;bottom:-30px;
+                white-space:nowrap}
+.foto::before{content:'';position:absolute;inset:0;z-index:2;
+              box-shadow:inset 0 0 0 1px rgba(231,226,217,.13)}
+
+/* Velo de lectura: degradado del color EXACTO del fondo, sin blur. */
+.velo{position:absolute;z-index:3;pointer-events:none}
+
+.goma{position:absolute;border:3px solid var(--sangre);color:var(--sangre);
+      font-family:ISans;font-weight:700;font-size:25px;letter-spacing:.2em;
+      padding:11px 21px;text-transform:uppercase;opacity:.8;
+      transform:rotate(-13deg);border-radius:4px}
+
+/* ── piezas por slide ── */
+.ficha{border:1px solid var(--linea);background:var(--fondo-2)}
+.ficha .fila{display:grid;grid-template-columns:190px 1fr;
+             border-bottom:1px solid var(--linea)}
+.ficha .fila:last-child{border-bottom:0}
+.ficha .k{font-family:ISans;font-weight:600;font-size:15px;letter-spacing:.12em;
+          text-transform:uppercase;color:var(--texto-3);padding:18px 20px;
+          border-right:1px solid var(--linea)}
+.ficha .v{font-family:Fraunces;font-weight:600;font-size:27px;padding:15px 22px;
+          color:var(--texto)}
+
+.tecnica{font-family:Fraunces;font-weight:900;font-size:100px;line-height:.98;
+         letter-spacing:-.035em;display:flex;align-items:baseline;gap:26px}
+.tecnica .n{font-family:ISans;font-weight:600;font-size:21px;color:var(--sangre);
+            letter-spacing:.14em}
+
+.pista{border-top:2px solid var(--frio);padding-top:19px}
+.pista h4{font-family:Fraunces;font-weight:900;font-size:50px;letter-spacing:-.03em;
+          color:var(--texto)}
+.pista p{font-family:Fraunces;font-weight:300;font-size:24px;line-height:1.36;
+         color:var(--texto-2);margin-top:8px}
+
+.eslabon{border:1px solid var(--linea);background:var(--fondo-2);padding:24px 30px;
+         text-align:center;min-width:286px}
+.eslabon .k{font-family:ISans;font-weight:600;font-size:14px;letter-spacing:.15em;
+            text-transform:uppercase;color:var(--frio)}
+.eslabon .v{font-family:Fraunces;font-weight:900;font-size:44px;margin-top:6px;
+            letter-spacing:-.02em;color:var(--texto)}
+.flecha{font-family:Fraunces;font-weight:300;font-size:64px;color:var(--sangre)}
+
+#guion{position:fixed;left:0;right:0;bottom:0;z-index:99;background:rgba(8,7,6,.97);
+       color:var(--texto);padding:20px 34px;font-family:ISans;font-size:19px;
+       line-height:1.5;display:none;border-top:3px solid var(--sangre);
+       max-height:34vh;overflow:auto}
+#guion.abierto{display:block}
+#guion b{color:#E8A13C}
+#ayuda{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);z-index:98;
+       background:rgba(8,7,6,.92);color:var(--texto-2);padding:11px 22px;
+       border-radius:3px;font-family:ISans;font-size:15px;letter-spacing:.05em;
+       transition:opacity .6s}
+
+/* Controles de navegación en pantalla (no salen en el PDF). */
+#controles{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:98;
+           display:flex;gap:10px;align-items:center;
+           background:rgba(8,7,6,.9);border:1px solid var(--linea);
+           padding:8px 12px;border-radius:40px;opacity:.5;transition:opacity .3s}
+#controles:hover{opacity:1}
+#controles button{width:46px;height:46px;border:0;border-radius:50%;cursor:pointer;
+                  background:var(--fondo-3);color:var(--texto);font-size:22px;
+                  font-family:ISans;display:grid;place-items:center;transition:.15s}
+#controles button:hover{background:var(--sangre);color:#fff}
+#controles .cuenta{color:var(--texto-2);font-family:ISans;font-size:15px;
+                   letter-spacing:.08em;padding:0 8px;min-width:48px;text-align:center}
+#controles .full{font-size:19px}
+
+/* Número de quién habla la diapositiva (1 = persona 1, 2 = persona 2). */
+.orador{position:absolute;top:50px;right:60px;z-index:22}
+.orador .n{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;
+           font-family:ISans;font-weight:700;font-size:19px;color:#fff;
+           background:var(--sangre)}
+.orador.p2 .n{background:var(--frio);color:#181510}
+
+@media print{
+  @page{size:1600px 900px;margin:0}
+  html,body{overflow:visible;background:#fff;display:block;height:auto}
+  #escena{transform:none!important;box-shadow:none;width:1600px;
+          height:auto!important;overflow:visible!important;display:block}
+  #escena::after{display:none}
+  .slide{position:relative!important;opacity:1!important;visibility:visible!important;
+         display:block!important;break-after:page;page-break-after:always;
+         width:1600px;height:900px;overflow:hidden}
+  #guion,#ayuda,#controles{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="escena">
+
+<!-- ═══ 1 · PORTADA — foto a sangre, tipografia gigante encima ═══ -->
+<section class="slide" id="s1">
+  <div class="foto frio" style="position:absolute;inset:0;box-shadow:none">
+    <img src="assets/serie-hero.jpg" alt="Patrick Jane en El Mentalista">
+  </div>
+  <div class="velo" style="inset:0;
+       background:linear-gradient(100deg,var(--fondo) 0%,rgba(18,17,16,.94) 40%,rgba(18,17,16,.35) 74%,rgba(18,17,16,.6) 100%)"></div>
+  <div style="position:absolute;left:96px;top:196px;z-index:4">
+    <p class="sello" style="margin-bottom:22px">Psicología · Escuela psicológica</p>
+    <h1 class="tit t-xl" style="margin-bottom:6px">Patrick</h1>
+    <h1 class="tit t-xl rojo" style="font-weight:600;font-style:italic;margin-bottom:40px">Jane</h1>
+    <p class="cuerpo" style="max-width:21ch">El falso médium que resolvía crímenes mirando lo que nadie miraba.</p>
+    <p class="meta" style="margin-top:50px">Felipe Mas &nbsp;·&nbsp; 24 de agosto de 2026</p>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+</section>
+
+<!-- ═══ 2 · LA SERIE — ficha de expediente + placa del CBI ═══ -->
+<section class="slide" id="s2">
+  <div style="position:absolute;left:88px;top:112px;width:820px">
+    <p class="sello" style="margin-bottom:14px">Expediente</p>
+    <h2 class="tit t-lg" style="margin-bottom:42px">La serie</h2>
+    <div class="ficha">
+      <div class="fila"><div class="k">Título</div><div class="v">El Mentalista <span style="font-weight:400;font-style:italic;color:var(--texto-3)">(The Mentalist)</span></div></div>
+      <div class="fila"><div class="k">Sujeto</div><div class="v">Patrick Jane</div></div>
+      <div class="fila"><div class="k">Antes</div><div class="v">Falso médium</div></div>
+      <div class="fila"><div class="k">Ahora</div><div class="v">Consultor del CBI, California</div></div>
+      <div class="fila"><div class="k">Compañera</div><div class="v">Agente Teresa Lisbon</div></div>
+    </div>
+  </div>
+  <div class="foto frio" style="position:absolute;right:92px;top:150px;width:430px;height:600px">
+    <img src="assets/serie-jane-retrato.jpg" alt="Patrick Jane">
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">02</span></div>
+</section>
+
+<!-- ═══ 3 · EL METODO — cuatro palabras enormes, sello encima ═══ -->
+<section class="slide" id="s3">
+  <div class="foto frio" style="position:absolute;right:0;top:0;width:560px;height:900px;box-shadow:none">
+    <img src="assets/serie-jane-2.jpg" alt="Patrick Jane">
+  </div>
+  <div class="velo" style="right:0;top:0;width:700px;height:900px;
+       background:linear-gradient(90deg,var(--fondo) 0%,rgba(18,17,16,.82) 42%,rgba(18,17,16,.15) 100%)"></div>
+  <div style="position:absolute;left:88px;top:132px;z-index:4">
+    <p class="sello" style="margin-bottom:12px">Método · sin poderes</p>
+    <h2 class="tit t-md" style="margin-bottom:40px">Cómo lee a la gente</h2>
+    <div style="display:flex;flex-direction:column;gap:15px">
+      <div class="tecnica"><span class="n">01</span><span>Observación</span></div>
+      <div class="tecnica"><span class="n">02</span><span>Lectura corporal</span></div>
+      <div class="tecnica"><span class="n">03</span><span>Memoria</span></div>
+      <div class="tecnica"><span class="n">04</span><span>Sugestión</span></div>
+    </div>
+  </div>
+  <div class="goma" style="right:118px;top:172px;z-index:7">Sin poderes</div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">03</span></div>
+</section>
+
+<!-- ═══ 4 · QUE MIRA — tres pistas desniveladas + retrato duro ═══ -->
+<section class="slide" id="s4">
+  <div style="position:absolute;left:88px;top:96px">
+    <p class="sello">Evidencia</p>
+    <h2 class="tit" style="margin-top:12px;font-size:64px;max-width:900px">Lee detalles que<br>los demás pasan por alto</h2>
+  </div>
+  <div style="position:absolute;left:88px;top:346px;width:404px" class="pista">
+    <h4>Gestos</h4><p>Una mano que tiembla, una mirada que se va antes de contestar.</p>
+  </div>
+  <div style="position:absolute;left:556px;top:432px;width:404px" class="pista">
+    <h4>Contradicciones</h4><p>Lo que la persona dice contra lo que su cuerpo ya dijo.</p>
+  </div>
+  <div style="position:absolute;left:88px;top:614px;width:404px" class="pista">
+    <h4>Hábitos</h4><p>Lo que alguien repite sin darse cuenta de que lo repite.</p>
+  </div>
+  <div class="foto frio" style="position:absolute;right:88px;top:250px;width:420px;height:490px">
+    <img src="assets/serie-jane-rj.jpg" alt="Patrick Jane observando">
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">04</span></div>
+</section>
+
+<!-- ═══ 5 · RED JOHN — el smiley de sangre, su firma ═══ -->
+<section class="slide" id="s5">
+  <!-- Contenedor que ocupa la mitad derecha entera: centra el smiley SIEMPRE,
+       vertical y horizontal, sin importar el tamaño de la imagen. -->
+  <div style="position:absolute;right:40px;top:0;width:660px;height:900px;z-index:3;
+              display:grid;place-items:center;
+              background:radial-gradient(circle at center,rgba(193,39,45,.15) 0%,rgba(193,39,45,0) 52%)">
+    <img class="smiley" src="assets/redjohn-smiley2.png" alt="El smiley de sangre, la firma de Red John"
+         style="width:370px;max-height:600px;object-fit:contain;
+                filter:drop-shadow(0 0 30px rgba(193,39,45,.35))">
+  </div>
+  <div style="position:absolute;left:96px;top:212px;width:700px;z-index:4">
+    <p class="sello" style="margin-bottom:14px">El motor de la serie</p>
+    <h2 class="tit t-lg rojo" style="margin-bottom:34px">Red John</h2>
+    <p class="cuerpo" style="max-width:28ch;font-size:34px">
+      Mató a <b>su esposa y a su hija</b> como venganza, porque Jane se burló de él
+      <b>públicamente, en TV</b>, diciendo que podía identificarlo.
+    </p>
+    <p class="meta" style="margin-top:38px;font-size:20px">
+      Firmaba cada crimen con esta cara sonriente pintada en la pared.
+    </p>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">05</span></div>
+</section>
+
+<!-- ═══ 6 · LA CULPA Y LISBON — palabra gigante + consecuencias + foto ═══ -->
+<section class="slide" id="s6">
+  <div style="position:absolute;left:88px;top:150px;width:520px">
+    <p class="sello" style="margin-bottom:12px">Consecuencia</p>
+    <h2 class="tit" style="font-size:112px;line-height:.88">Esa<br>culpa<br><span class="rojo">lo vuelve</span></h2>
+  </div>
+  <div style="position:absolute;left:640px;top:158px;width:490px;display:flex;flex-direction:column;gap:26px">
+    <div class="pista"><h4 style="font-size:42px">Manipulador</h4><p>Usa a la gente como usaba al público cuando fingía.</p></div>
+    <div class="pista"><h4 style="font-size:42px">Impulsivo</h4><p>No espera la orden ni la prueba: si lo ve, va.</p></div>
+    <div class="pista"><h4 style="font-size:42px">Rompe las reglas</h4><p>Justicia por mano propia, aunque arruine el caso.</p></div>
+  </div>
+  <div class="foto frio" style="position:absolute;right:88px;top:196px;width:320px;height:430px">
+    <img src="assets/serie-lisbon.jpg" alt="La agente Teresa Lisbon">
+    <span class="pie-foto">Lisbon: la regla contra el atajo</span>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">06</span></div>
+</section>
+
+<!-- ═══ 7 · CONDUCTISMO — titulo gigante + dos bloques ═══ -->
+<section class="slide" id="s7">
+  <div class="foto frio" style="position:absolute;right:0;top:0;width:620px;height:900px;box-shadow:none">
+    <!-- Escena de cementerio: viene muy apagada, se levanta para que se lea. -->
+    <img src="assets/serie-jane-caza.png" alt="Patrick Jane observando"
+         style="filter:grayscale(1) sepia(.06) contrast(1.24) brightness(1.32);
+                object-position:center 38%">
+  </div>
+  <div class="velo" style="right:0;top:0;width:760px;height:900px;
+       background:linear-gradient(90deg,var(--fondo) 0%,rgba(18,17,16,.88) 46%,rgba(18,17,16,.2) 100%)"></div>
+  <div style="position:absolute;left:88px;top:120px;z-index:4">
+    <p class="sello" style="margin-bottom:12px">Segunda parte · la escuela</p>
+    <h2 class="tit" style="font-size:120px;line-height:.9">Conductismo</h2>
+  </div>
+  <div style="position:absolute;left:88px;top:376px;width:520px;z-index:4">
+    <p class="cuerpo" style="max-width:100%;font-size:32px">
+      Jane <b>no interpreta el inconsciente</b> ni hace introspección tipo Freud.
+      Se basa pura y exclusivamente en la <b>conducta observable</b>.
+    </p>
+  </div>
+  <div style="position:absolute;left:88px;top:626px;z-index:4;border-top:2px solid var(--frio);padding-top:20px;width:520px">
+    <p class="sello" style="color:var(--frio);margin-bottom:12px">Qué mira</p>
+    <p class="cuerpo" style="max-width:100%;font-size:27px">
+      Gestos · tono de voz · postura · sudor · pupilas · tics
+    </p>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">07</span></div>
+</section>
+
+<!-- ═══ 8 · ESTIMULO → RESPUESTA — diagrama horizontal ═══ -->
+<section class="slide" id="s8">
+  <div style="position:absolute;left:88px;top:104px">
+    <p class="sello">El mecanismo</p>
+    <h2 class="tit t-md" style="margin-top:12px">Estímulo, respuesta, predicción</h2>
+  </div>
+  <div style="position:absolute;left:88px;top:340px;display:flex;align-items:center;gap:26px">
+    <div class="eslabon"><div class="k">01 · entra</div><div class="v">Estímulo</div></div>
+    <span class="flecha">→</span>
+    <div class="eslabon"><div class="k">02 · sale</div><div class="v">Respuesta</div></div>
+    <span class="flecha">→</span>
+    <div class="eslabon" style="border-color:var(--sangre)">
+      <div class="k" style="color:var(--sangre)">03 · Jane</div><div class="v rojo">Predicción</div></div>
+  </div>
+  <p class="cuerpo" style="position:absolute;left:88px;top:556px;max-width:34ch;font-size:30px">
+    Encuentra patrones de <b>refuerzo, condicionamiento y aprendizaje previo</b>, y con eso
+    anticipa qué va a hacer la persona. Un <b>observador conductista extremo</b>: no busca
+    entender la mente profunda, busca <b>predecir</b>.
+  </p>
+  <!-- Abajo a la derecha: arriba chocaba con el cuadro "Predicción". -->
+  <div class="foto frio" style="position:absolute;right:88px;top:540px;width:392px;height:262px">
+    <img src="assets/serie-jane-lisbon.jpg" alt="Jane y Lisbon en El Mentalista">
+    <span class="pie-foto">Leer al otro por lo que hace, no por lo que dice</span>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+  <div class="pie"><span>El Mentalista</span><span class="num">08</span></div>
+</section>
+
+<!-- ═══ 9 · CONTRASTE Y CIERRE — dos mitades + remate ═══ -->
+<section class="slide" id="s9">
+  <div style="position:absolute;left:0;top:0;width:800px;height:640px;padding:112px 66px 0 88px">
+    <p class="sello" style="margin-bottom:14px">Conductismo</p>
+    <h2 class="tit" style="font-size:70px;line-height:.94;margin-bottom:26px">Por lo que<br>hace</h2>
+    <p class="cuerpo" style="max-width:100%;font-size:28px">
+      Le tiembla la mano al contestar, <b>entonces miente</b>. Conducta observable: se mide,
+      se registra, se predice.
+    </p>
+  </div>
+  <div style="position:absolute;left:800px;top:96px;height:520px;width:1px;background:var(--linea);z-index:4"></div>
+  <div style="position:absolute;left:800px;top:0;width:800px;height:640px;padding:112px 88px 0 66px;background:var(--fondo-2)">
+    <p class="sello" style="margin-bottom:14px;color:var(--frio)">Psicoanálisis</p>
+    <h2 class="tit" style="font-size:70px;line-height:.94;margin-bottom:26px;color:var(--texto-2)">Por lo que<br>siente</h2>
+    <p class="cuerpo" style="max-width:100%;font-size:28px">
+      <b>Por qué</b> miente, qué reprime detrás de esa mentira. Inconsciente e
+      interpretación: lo que Jane <em>no</em> hace.
+    </p>
+  </div>
+  <div style="position:absolute;left:0;bottom:0;width:1600px;height:260px;background:var(--fondo);
+              border-top:2px solid var(--sangre);display:flex;align-items:center;
+              justify-content:space-between;padding:0 88px">
+    <p class="tit" style="font-size:56px;line-height:1.06">
+      Jane no adivina.<br><span class="rojo">Observa, registra y predice.</span>
+    </p>
+    <p class="meta" style="text-align:right;font-size:19px">Felipe Mas<br>24 · 08 · 2026</p>
+  </div>
+  <div class="marco"><i></i><i></i><i></i><i></i></div>
+  <div class="barra"></div>
+</section>
+
+</div><!-- /#escena -->
+
+<div id="guion"></div>
+<div id="ayuda">← → cambiar &nbsp;·&nbsp; <b>G</b> guion &nbsp;·&nbsp; <b>F</b> pantalla completa</div>
+
+<div id="controles">
+  <button id="btn-prev" title="Anterior (←)">‹</button>
+  <span class="cuenta" id="cuenta">1 / 9</span>
+  <button id="btn-next" title="Siguiente (→)">›</button>
+  <button id="btn-full" class="full" title="Pantalla completa (F)">⛶</button>
+</div>
+
+<script src="assets/gsap.min.js"></script>
+<script src="deck.js"></script>
+</body>
+</html>

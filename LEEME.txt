@@ -1,0 +1,17 @@
+EL MENTALISTA / PATRICK JANE — Psicologia · 24/08/2026
+
+QUE ABRIR
+  ABRIR-PRESENTACION.bat ......... la presentacion (doble click)
+  Mi-Parte-El-Mentalista.pdf ..... tu hoja A4 para imprimir
+  GUION-ORAL.txt ................. que decir en cada diapositiva
+  Patrick-Jane-Presentacion.pdf .. respaldo por si falla la compu del colegio
+
+DURANTE LA EXPOSICION
+  Flechas o click .... cambiar de diapositiva
+  G .................. muestra abajo el guion de esa diapositiva
+  F .................. pantalla completa
+
+Son 9 diapositivas: 1 a 6 las decis vos, 7 a 9 tu companero.
+
+Funciona SIN INTERNET: fuentes, animaciones y fotos estan en assets/.
+Las fotos son fotogramas de la serie, para uso escolar.
