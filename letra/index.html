@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escribí a mano — carta estilo Messi</title>
+<style>
+@font-face{font-family:Manuscrita;src:url(manuscrita.ttf)format('truetype');font-display:swap}
+
+:root{
+  --papel:#F7F3E8; --papel-borde:#E4DCC8; --renglon:#C3D2E6;
+  --tinta:#1D2B4A;            /* azul de birome */
+  --fondo:#141311; --fondo-2:#1E1C19;
+  --texto:#E9E3D6; --texto-2:#A29A8A;
+  --acento:#C1272D;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--fondo);color:var(--texto);
+     font-family:ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+     min-height:100vh;padding:26px 18px 70px}
+
+header{max-width:860px;margin:0 auto 26px}
+h1{font-family:Manuscrita,cursive;font-size:clamp(30px,6vw,48px);line-height:1.15;
+   color:var(--texto);letter-spacing:.01em}
+h1 span{color:var(--acento)}
+.sub{color:var(--texto-2);font-size:15px;margin-top:10px;max-width:56ch;line-height:1.55}
+
+/* Hoja de cuaderno */
+.hoja{max-width:860px;margin:0 auto;background:var(--papel);
+      border:1px solid var(--papel-borde);border-radius:3px;
+      box-shadow:0 18px 50px rgba(0,0,0,.55);padding:34px 30px 40px;position:relative}
+.hoja::before{content:'';position:absolute;left:0;right:0;top:0;height:26px;
+  background:repeating-linear-gradient(90deg,transparent 0 14px,var(--papel-borde) 14px 15px)}
+
+#texto{width:100%;border:0;outline:0;resize:vertical;background:transparent;
+  font-family:Manuscrita,cursive;color:var(--tinta);
+  font-size:clamp(19px,2.7vw,26px);line-height:2.05;min-height:46vh;
+  /* Los renglones se dibujan detrás del texto y acompañan la interlínea */
+  background-image:linear-gradient(transparent calc(2.05em - 2px),var(--renglon) calc(2.05em - 2px),var(--renglon) 2.05em);
+  background-size:100% 2.05em;background-attachment:local;
+  padding-top:.25em}
+#texto::placeholder{color:#A8B4C6}
+
+.barra{max-width:860px;margin:20px auto 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:600 15px/1 ui-sans-serif,system-ui,sans-serif;cursor:pointer;
+  padding:13px 20px;border-radius:2px;border:1px solid #34302A;
+  background:var(--fondo-2);color:var(--texto);transition:.15s}
+button:hover{border-color:var(--acento);color:#fff}
+button.principal{background:var(--acento);border-color:var(--acento);color:#fff}
+button.principal:hover{filter:brightness(1.12)}
+.cuenta{margin-left:auto;color:var(--texto-2);font-size:13px;font-variant-numeric:tabular-nums}
+
+.aviso{max-width:860px;margin:30px auto 0;border-left:3px solid var(--acento);
+  background:var(--fondo-2);padding:15px 18px;color:var(--texto-2);
+  font-size:14px;line-height:1.6;border-radius:0 3px 3px 0}
+.aviso b{color:var(--texto)}
+footer{max-width:860px;margin:26px auto 0;color:#6B6357;font-size:13px}
+canvas{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Escribí <span>a mano</span></h1>
+  <p class="sub">Escribí abajo y se ve como escrito con birome sobre una hoja de cuaderno.
+     Después descargalo como imagen y mandalo por WhatsApp.</p>
+</header>
+
+<div class="hoja">
+  <textarea id="texto" spellcheck="false" placeholder="Escribí acá…"></textarea>
+</div>
+
+<div class="barra">
+  <button class="principal" id="bajar">Descargar imagen</button>
+  <button id="carta">Poner la carta de Messi</button>
+  <button id="limpiar">Limpiar</button>
+  <span class="cuenta" id="cuenta">0 caracteres</span>
+</div>
+
+<div class="aviso">
+  <b>Un aclarado honesto:</b> esta no es la letra real de Messi. Su letra no existe
+  como tipografía descargable, y la única foto pública de la carta tiene las letras
+  a 13 píxeles: no alcanza para calcarla. Esta es la manuscrita libre que más se le
+  parece en estilo (imprenta mayúscula, trazo de birome).
+</div>
+
+<footer>El texto no sale de tu teléfono: la imagen se genera acá mismo.</footer>
+
+<canvas id="lienzo"></canvas>
+
+<script>
+const ta = document.getElementById('texto');
+const cuenta = document.getElementById('cuenta');
+
+const CARTA = `DESPUÉS DE ESTE TIEMPO QUE PASÓ DESDE LA FINAL, PENSÁNDOLO MUCHO, QUIERO COMUNICARLES A TODOS QUE ME RETIRO DE LA SELECCIÓN...
+
+FUE UNA DECISIÓN QUE DOLIÓ Y DUELE EN EL ALMA PERO ENTIENDO QUE ES EL MOMENTO. LES JURO QUE SIEMPRE DEJÉ TODO, NO SOLO LOS ÚLTIMOS AÑOS QUE SE GANÓ TODO ANTES TAMBIÉN Y SIEMPRE PELEÉ Y ME DEJÉ TODO POR ESTA CAMISETA, POR DARLES ALEGRÍAS Y HACER QUE SE SIENTAN ORGULLOSOS DE SER ARGENTINOS A TRAVÉS DEL FÚTBOL.
+
+QUEDA POCO Y SE VAN CERRANDO ETAPAS Y ESTA ES UNA QUE ME DUELE MUCHO. AMO, AMÉ Y AMARÉ SIEMPRE ESTAR EN LA SELECCIÓN. ME VACIÉ, YA NO TENGO MÁS PARA DAR Y APARTE VIENEN CHICOS MUY GRANDES ATRÁS QUE MERECEN ESTAR.
+
+GRACIAS POR TODO EL CARIÑO DE ESTOS 20 AÑOS. VOY A EXTRAÑAR MUCHO ESCUCHARLOS DESDE ADENTRO. AHORA VOY A SER UNO MÁS DE USTEDES, ALENTANDO Y BANCANDO SIEMPRE DESDE AFUERA (EN LAS BUENAS Y EN LAS MALAS, MUCHO MÁS).
+
+GRACIAS A MI FAMILIA POR ESTAR SIEMPRE, POR ACOMPAÑARME EN ESTE VIAJE TAN HERMOSO PERO DIFÍCIL. GRACIAS A CADA UNO DE ENTRENADORES, COMPAÑEROS Y DIRIGENTES QUE ME TOCÓ COMPARTIR. ME LLEVO RECUERDOS Y MOMENTOS INOLVIDABLES VIVIDOS.
+
+ME VOY CON LA TRANQUILIDAD Y EL ORGULLO DE HABERLES REGALADO, JUNTOS CON MIS COMPAÑEROS, MOMENTOS SOÑADOS. FUE UNA LOCURA HABERLO VIVIDO CON USTEDES. ¡LOS QUIERO!
+
+GRACIAS DIOS POR HACERME ARGENTINO.
+
+¡VAMOS ARGENTINA!`;
+
+const actualizar = () => cuenta.textContent = ta.value.length + ' caracteres';
+ta.addEventListener('input', actualizar);
+
+document.getElementById('carta').onclick = () => { ta.value = CARTA; actualizar(); ta.focus(); };
+document.getElementById('limpiar').onclick = () => { ta.value = ''; actualizar(); ta.focus(); };
+
+/* Dibuja el texto en un canvas y lo baja como PNG.
+   Se hace a mano en vez de con una librería: son 30 líneas y evita depender
+   de un CDN que en el celular puede no cargar. */
+document.getElementById('bajar').onclick = async () => {
+  const txt = ta.value.trim();
+  if (!txt) { ta.focus(); return; }
+
+  await document.fonts.load('40px Manuscrita');
+
+  const T = 40, INTER = T * 2.05, MARGEN = 60, ANCHO = 1000;
+  const c = document.getElementById('lienzo');
+  const g = c.getContext('2d');
+  g.font = `${T}px Manuscrita`;
+
+  // Corta cada párrafo en renglones que entren en el ancho
+  const lineas = [];
+  for (const parrafo of txt.split('\n')) {
+    if (!parrafo.trim()) { lineas.push(''); continue; }
+    let actual = '';
+    for (const palabra of parrafo.split(' ')) {
+      const prueba = actual ? actual + ' ' + palabra : palabra;
+      if (g.measureText(prueba).width > ANCHO - MARGEN * 2 && actual) {
+        lineas.push(actual); actual = palabra;
+      } else actual = prueba;
+    }
+    lineas.push(actual);
+  }
+
+  c.width = ANCHO;
+  c.height = MARGEN * 2 + INTER * lineas.length;
+
+  g.fillStyle = '#F7F3E8';
+  g.fillRect(0, 0, c.width, c.height);
+
+  g.strokeStyle = '#C3D2E6'; g.lineWidth = 2;
+  for (let i = 0; i < lineas.length; i++) {
+    const y = MARGEN + INTER * i + T * 1.32;
+    g.beginPath(); g.moveTo(MARGEN / 2, y); g.lineTo(c.width - MARGEN / 2, y); g.stroke();
+  }
+
+  g.font = `${T}px Manuscrita`;
+  g.fillStyle = '#1D2B4A';
+  g.textBaseline = 'alphabetic';
+  lineas.forEach((l, i) => g.fillText(l, MARGEN, MARGEN + INTER * i + T));
+
+  c.toBlob(b => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'carta.png';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }, 'image/png');
+};
+
+actualizar();
+</script>
+</body>
+</html>
